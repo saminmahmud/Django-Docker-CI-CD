@@ -36,17 +36,17 @@ jobs:
           --health-retries 5
   
     env:
-      DB_NAME: django_db
-      DB_USER: postgres
-      DB_PASSWORD: postgres
-      DB_HOST: localhost
-      DB_PORT: 5432
+      SECRET_KEY: github-actions-secret-key
+      DEBUG: "False"
+
+      POSTGRES_DB: django_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_HOST: localhost
+      POSTGRES_PORT: 5432
 
       REDIS_HOST: localhost
       REDIS_PORT: 6379
-
-      SECRET_KEY: github-actions-secret-key
-      DEBUG: False
 
     steps:
       - name: Checkout Repository

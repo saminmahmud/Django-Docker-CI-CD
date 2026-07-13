@@ -14,7 +14,7 @@ def get_users():
 
 def home(request):
     context = {
-        'title': "Welcome to the Django Docker CI/CD Project!",
+        'title': "Welcome to the Django Docker CI/CD Project! (v2)",
         'users': get_users(),
     }
     return render(request, 'home.html', context)

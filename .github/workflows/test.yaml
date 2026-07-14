@@ -1,23 +1,35 @@
+# Github Actions workflow er nam
 name: Django Tests
 
+# kokhon ei workflow run hobe
 on:
+  # main branch e push korle workflow run hobe
   push:
     branches: 
       - main 
     
 jobs:
+  # job er nam
   tests:
+    # job kothay run hobe. ekhane ubuntu-latest environment e run hobe
     runs-on: ubuntu-latest
 
+    # Test cholar jonno proyojonio services
     services:
       postgres:
         image: postgres:16
+
+        # Database environment variables
         env:
           POSTGRES_DB: django_db
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+
+        # Runner er 5432 port ke container er 5432 port er sathe map kora hocche
         ports:
           - 5432:5432
+        
+        # PostgreSQL ready hoya prjonto github action wait korbe.
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -27,14 +39,19 @@ jobs:
           
       redis:
         image: redis:7-alpine
+
+        # Runner er 6379 port ke container er 6379 port er sathe map kora hocche
         ports:
           - 6379:6379
+
+        # Redis ready hoya prjonto github action wait korbe.
         options: >-
           --health-cmd "redis-cli ping"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-  
+
+    # Sob setup e use korar jonno environment variables
     env:
       SECRET_KEY: github-actions-secret-key
       DEBUG: "False"
@@ -47,24 +64,29 @@ jobs:
 
       REDIS_HOST: localhost
       REDIS_PORT: 6379
-
+      
     steps:
+      # Github repository er source code runner e download korbe (repository checkout korbe)
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Setup Python environment. Python 3.11 install korbe ebong pip dependency cache korbe.
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: 3.11
           cache: "pip"
-
+      
+      # Project er dependency install korbe. 
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      # Database migration run korbe
       - name: Run Migrations
         run: python manage.py migrate
 
+      # Test run korbe
       - name: Run Tests
         run: python manage.py test

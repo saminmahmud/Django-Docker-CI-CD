@@ -1,27 +1,28 @@
-# Use the official Python image as the base image
+# Base image
 FROM python:3.11-slim 
 
-# Set environment variables to prevent Python from writing .pyc files and to ensure that Python output is sent straight to the terminal without buffering
+# Python output (print, log) sathe sathe terminal e dekhabe
 ENV PYTHONUNBUFFERED=1
-# Set environment variable to prevent Python from writing .pyc files
+# Python bytecode file (.pyc) generate hobe na, ete image ekto clean thakbe
 ENV PYTHONDONTWRITEBYTECODE=1
 
-# Set the working directory in the container
+# Set working directory. Next sob command /app directory theke execute hobe.
 WORKDIR /app
 
-# Copy the requirements file into the container
+# Prothome sodhu requirements.txt file copy korbo, jate docker cache use kore dependency install korte pare. Ete build time kombe.
 COPY requirements.txt .
 
-# Upgrade pip to the latest version
+# Pip version update korbo, karon base image e purono pip thakte pare. Ete dependency install er somoy error kombe.
 RUN pip install --upgrade pip
-# Install the dependencies specified in the requirements file
+# Ekhon requirements.txt file e thaka sob dependency install korbo.
 RUN pip install -r requirements.txt
 
-# Copy the rest of the application code into the container
+# Project er baki sob file container e copy korbo
 COPY . .
 
-# Expose the port that the application will run on
+# Container er application 8000 port e run hobe.
+# (eti sodhu documentation er jonno, docker-compose.yaml file e port mapping kora ache)
 EXPOSE 8000
 
-# Set the command to run the application 
+# Container run korar somoy ei command execute hobe. Ekhane Django development server run hobe.
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

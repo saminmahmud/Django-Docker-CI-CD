@@ -1,5 +1,7 @@
+# Github Actions workflow er nam
 name: Push Docker Image
 
+# workflow sorasori push hole run hobe na. Ei workflow run hobe jokhon "Django Tests" workflow successfully complete hobe.
 on:
   workflow_run:
     workflows:
@@ -9,37 +11,50 @@ on:
 
 jobs:
   push-to-registry:
+    # Sodhumatro "Django Tests" workflow successfully complete hole ei job run hobe. Test fail hole Docker image push hobe na.
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
+    # job kothay run hobe. ekhane ubuntu-latest environment e run hobe
     runs-on: ubuntu-latest
 
     steps:
+      # Repository checkout korbe. Mane repository er source code runner e download korbe
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      # Docker Hub e login korbe. Docker Hub er username ebong password ke github secrets e store kora ache.
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      # Docker image er metadata extract korbe. Metadata er moddhe image name, tags, labels thakbe.
       - name: Extract Docker Metadata
         id: meta
         uses: docker/metadata-action@v5
         with:
+          # Docker Hub repository name. Ei name e Docker image push hobe.
           images: ${{ secrets.DOCKER_USERNAME }}/django-docker-ci
+          # latest tag, commit SHA tag, branch name tag create korbe
           tags: |
             type=raw,value=latest
             type=sha
             type=ref,event=branch
-
+        
+      # Docker image build korbe ebong Docker Hub e push korbe. Image er name, tags, labels metadata theke nibe.
       - name: Build & Push Docker Image
         uses: docker/build-push-action@v5
         with:
+          # Bortoman directory ke Docker build context hisebe use korbe. Mane Dockerfile ebong source code ei directory theke nibe.
           context: .
+          # Dockerfile er path ba kon Dockerfile use korbe. Ei file e Docker image build korar instruction thakbe.
           file: ./Dockerfile
+          # Build sesh e Docker image ke Docker Hub e push korbe. 
           push: true
+          # metadata step theke generate hoya tags use korbe
           tags: ${{ steps.meta.outputs.tags }}
+          # metadata step theke generate hoya labels use korbe
           labels: ${{ steps.meta.outputs.labels }}
 
 

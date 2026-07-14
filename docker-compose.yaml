@@ -2,19 +2,27 @@ name: demo-project
 
 services:
   web:
+    # Current directory theke Docker image build korbe
     build: .
     image: django-app
-    container_name: django-app-container2
+    container_name: django-app-container
+    # Container chalo hole ei command execute hobe
     command: python manage.py runserver 0.0.0.0:8000
+    # Host Port : Container Port
+    # Browser e localhost:8000 diye access kora jabe
     ports:
       - "8000:8000"
+    # Project folder container er /app er sathe sync thakbe
+    # Code change korle rebuild charai update hobe
     volumes:
       - .:/app
     env_file:
       - .env
+    # web service start howar age postgres and redis service start hobe
     depends_on:
       - postgres
       - redis
+    # ei network use korbe jekhane postgres and redis service o ache
     networks:
       - app-network
 
@@ -27,8 +35,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "5432:5432"
+    # Container er data persist thakbe jate container delete korleo data loss na hoy
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    # ei network use korbe jekhane web and redis service o ache
     networks:
       - app-network
 
@@ -37,15 +47,20 @@ services:
     container_name: redis-demo-container
     ports:
       - "6379:6379"
+    # Container er data persist thakbe jate container delete korleo data loss na hoy
     volumes:
       - redis_data:/data
+    # ei network use korbe jekhane web and postgres service o ache
     networks:
       - app-network
 
+# Named  volumes. Container delete korleo data loss na hoy.
+# docker-compose up -d command run korar por automatically create hoye jabe
 volumes:
   postgres_data:
   redis_data:
 
+# Custom network. Ei network er maddhome web, postgres and redis service ek sathe communicate korte parbe.
 networks:
   app-network:
     driver: bridge
